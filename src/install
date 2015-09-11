@@ -1,8 +1,0 @@
-.KEY type
-
-If NOT EXISTS i2c.library.<type>
-  Quit 5
-EndIf
-Avail FLUSH
-Copy i2c.library.<type> LIBS:i2c.library
-Version i2c.library FULL
