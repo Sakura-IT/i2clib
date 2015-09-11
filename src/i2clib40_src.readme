@@ -1,0 +1,70 @@
+Short:    Source code for i2c.library v40
+Author:   wnoeker@t-online.de (Wilhelm Noeker)
+Uploader: wnoeker@t-online.de (Wilhelm Noeker)
+Type:     hard/hack
+
+This shared library will allow easy access to integrated circuits with the
+I²C-bus interface. Note that this archive contains *only* the source code.
+If you haven't already done so, please also take a look at the
+documentation from the original distribution, in hard/hack/i2clib40.lha
+
+
+
+How to build the libraries
+--------------------------
+
+These sources are intended for use with A68k and BLink (both available from
+Aminet) and the system assembler includes (exec/types.i and such) from the
+NDK.
+
+If you've got all that, you will probably still need to edit line 3 in the
+"make" script so that it points to the real location of your include files.
+After that you can build a particular library, let's say i2c.library.disk
+for example, by typing
+
+> make disk
+
+and then call the "install" script to use it:
+
+> install disk
+
+Other useful commands are "make all", which builds all versions of the
+library, and "make clean", which will delete all library binaries again.
+Note that for the implementation of "all", the scripts assume that for each
+library called "i2c.library.type", an include file called "type.i" exists
+in the source directory.
+
+If you are going to use an assembler other than A68k, please be aware that
+there are no include statements for the "type.i" files in the source code.
+Their use is controlled from the "make" script, using A68k's -h option.
+
+
+
+Making modifications
+--------------------
+
+Multitasking access to global objects in the library is protected by a
+semaphore, this applies to I/O operations on the I2C bus in particular.
+Please be careful if you need to touch the semaphore code. Make a mistake
+and the library clients will hang or trash each other's data.
+
+Other than that, the workings of the library are rather straightforward and
+reasonably well documented, so good luck.
+
+
+
+Known bugs
+----------
+
+In the parallel and serial port versions of the library, some
+intializations are performed at the wrong time: Open() calls InitI2C(),
+which then executes the INITPORT macro, and in these versions of the
+library, that forces both I2C lines to HI. This means that a new client
+opening the library may corrupt another client's ongoing transmission.
+
+I think that a clean and simple solution would be to postpone this
+initialization until the bus is actually needed, like it is done in the
+disk version of the library, for example, with the ALLOCPERCALL macro. I
+never bothered to fix this, however, because the practical impact of the
+bug seems to be rather low, and because I had other things to do.
+
